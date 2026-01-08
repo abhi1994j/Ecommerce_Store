@@ -41,13 +41,11 @@ export default function ProductCard({
         <div className={productCardStyles.content}>
           {/* Category */}
           <p className={productCardStyles.category}>{category}</p>
-
           {/* Product Title */}
           <h2 className={productCardStyles.title}>{title}</h2>
-
           {/* Price and Rating */}
           <div className={productCardStyles.priceContainer}>
-            <p className={productCardStyles.price}>{price}</p>
+            <p className={productCardStyles.price}>$ {price}</p>
             <div className={productCardStyles.ratingContainer}>
               <Star className={productCardStyles.ratingIcon} />
               <span className={productCardStyles.ratingText}>{rating}</span>

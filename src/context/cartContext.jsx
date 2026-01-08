@@ -1,41 +1,71 @@
 import { createContext, useEffect, useState } from 'react';
 import { getAllProducts } from '../services/apiResponse';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 
 export const cartContext = createContext();
 
 export default function CartProvider({ children }) {
-  const storedCartlist = localStorage.getItem('cartlist');
-  // const [token, setToken] = useState(localStorage.getItem('token') || null);
+  const { user } = useAuth();
   const [productList, setProductList] = useState([]);
-  const [cartList, setCartLst] = useState(
-    storedCartlist ? JSON.parse(storedCartlist) : []
-  );
+  const [originalProductList, setOriginalProductList] = useState([]);
+  const [cartList, setCartLst] = useState([]);
+  const [wishListProducts, setWishListProdutcs] = useState([]);
   const [quantity, setQuantity] = useState(1);
-  const [loading, setLoading] = useState(true); // For loading state
-  const [error, setError] = useState(null); // For error state
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isOpenCart, setIsOpenCart] = useState(false);
-  const getInitialWishlist = () => {
+
+  const getCartKey = (userId) => `cartlist_${userId}`;
+  const getWishlistKey = (userId) => `wishlist_${userId}`;
+
+  const loadUserData = (userId) => {
+    if (!userId) {
+      setCartLst([]);
+      setWishListProdutcs([]);
+      return;
+    }
+
     try {
-      const storedWishlist = localStorage.getItem('wishlist');
-      return storedWishlist ? JSON.parse(storedWishlist) : [];
+      const storedCart = localStorage.getItem(getCartKey(userId));
+      setCartLst(storedCart ? JSON.parse(storedCart) : []);
+
+      const storedWishlist = localStorage.getItem(getWishlistKey(userId));
+      setWishListProdutcs(storedWishlist ? JSON.parse(storedWishlist) : []);
     } catch (error) {
-      console.error('Invalid wishlist data in localStorage', error);
-      localStorage.removeItem('wishlist'); // cleanup bad data
-      return [];
+      console.error('Error loading user data from localStorage', error);
+      setCartLst([]);
+      setWishListProdutcs([]);
     }
   };
 
-  const [wishListProducts, setWishListProdutcs] = useState(getInitialWishlist);
+  useEffect(() => {
+    if (user?.uid) {
+      loadUserData(user.uid);
+    } else {
+      setCartLst([]);
+      setWishListProdutcs([]);
+    }
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (user?.uid) {
+      localStorage.setItem(getCartKey(user.uid), JSON.stringify(cartList));
+    }
+  }, [cartList, user?.uid]);
+
+  useEffect(() => {
+    if (user?.uid) {
+      localStorage.setItem(getWishlistKey(user.uid), JSON.stringify(wishListProducts));
+    }
+  }, [wishListProducts, user?.uid]);
 
   function addToCart(product, quantity) {
     const existingCartProduct = cartList.find((item) => item.id === product.id);
 
     if (existingCartProduct) {
       const updatedCart = cartList.map((item) =>
-        item.id === product.id
-          ? { ...item, quantity: item.quantity + quantity }
-          : item
+        item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
       );
       setCartLst(updatedCart);
     } else {
@@ -50,46 +80,51 @@ export default function CartProvider({ children }) {
   }
 
   function removeFromCart(id) {
-    console.log(id, 'remove');
     const updatedCartList = cartList.filter((item) => item.id !== id);
     setCartLst(updatedCartList);
-    toast.error('Product remove from Cart');
+    toast.error('Product removed from Cart');
   }
 
-  // const login = (token) => {
-  //   setToken(token);
-  //   localStorage.setItem('token', token);
-  // };
+  function updateCartQuantity(id, newQuantity) {
+    if (newQuantity < 1) {
+      removeFromCart(id);
+      return;
+    }
 
-  // const logout = () => {
-  //   setToken(null);
-  //   localStorage.removeItem('token');
-  // };
+    const updatedCart = cartList.map((item) =>
+      item.id === id ? { ...item, quantity: newQuantity } : item
+    );
+    setCartLst(updatedCart);
+  }
 
-  // Add or Remove Wishlist Product Functionality
+  // NEW: Clear cart method (used after successful order)
+  function clearCart() {
+    setCartLst([]);
+    if (user?.uid) {
+      localStorage.removeItem(getCartKey(user.uid));
+    }
+  }
+
   function handleProductToWishlist(id, e) {
-    e.stopPropagation(); // Prevent opening modal when clicking heart
+    e.stopPropagation();
     const isInWishlist = wishListProducts.some((product) => product.id === id);
 
     if (!isInWishlist) {
-      // Add to wishlist
       const product = productList.find((p) => p.id === id);
       toast.success('Product added to the Wishlist');
       setWishListProdutcs([...wishListProducts, product]);
     } else {
-      // Remove from wishlist - Fixed the filter logic
-      const filteredProducts = wishListProducts.filter(
-        (product) => product.id !== id // Changed === to !==
-      );
-      toast.error('Product removed to the Wishlist');
+      const filteredProducts = wishListProducts.filter((product) => product.id !== id);
+      toast.error('Product removed from the Wishlist');
       setWishListProdutcs(filteredProducts);
     }
   }
 
   const fetchProducts = async () => {
     try {
-      const data = await getAllProducts(); // Wait for the data
+      const data = await getAllProducts();
       setProductList(data);
+      setOriginalProductList(data);
     } catch (err) {
       setError('Failed to fetch products');
       console.error(err);
@@ -99,33 +134,30 @@ export default function CartProvider({ children }) {
   };
 
   useEffect(() => {
-    localStorage.setItem('cartlist', JSON.stringify(cartList));
-  }, [cartList]);
-
-  useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishListProducts));
-  }, [wishListProducts]);
-
-  useEffect(() => {
-    fetchProducts(); // Invoke the async function
+    fetchProducts();
   }, []);
 
   return (
     <cartContext.Provider
       value={{
         productList,
+        setProductList,
+        originalProductList,
         loading,
         error,
         wishListProducts,
-        setWishListProdutcs,
+        setWishListProducts: setWishListProdutcs,
         handleProductToWishlist,
         isOpenCart,
         setIsOpenCart,
         cartList,
+        setCartLst, // Export this for CheckoutModal
         addToCart,
         removeFromCart,
+        updateCartQuantity,
+        clearCart, // NEW: Export clearCart method
         quantity,
-        setQuantity
+        setQuantity,
       }}
     >
       {children}

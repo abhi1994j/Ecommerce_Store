@@ -3,16 +3,16 @@ import ErrorFallback from './libs/ErrorFallback';
 import { Loader } from './libs/Loader';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Toaster } from 'react-hot-toast';
-import Login from './components/Login';
-import SignupModal from './components/SignupModal';
+import { Routes, Route } from 'react-router-dom';
 
 function App() {
-
   // Lazy-loaded components
   const Dashboard = lazy(() => import('./pages/Dashboard'));
+  const OrdersPage = lazy(() => import('./pages/OrderPage'));
+
   return (
     <>
-      {/* <ErrorBoundary
+      <ErrorBoundary
         FallbackComponent={ErrorFallback}
         onReset={() => {
           // Optionally reset state here or reload
@@ -20,11 +20,15 @@ function App() {
         }}
       >
         <Suspense fallback={<Loader />}>
-          <Dashboard />
+          {/* <Dashboard /> */}
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/orders" element={<OrdersPage />} />
+          </Routes>
           <Toaster position="top-left" reverseOrder={true} />
         </Suspense>
-      </ErrorBoundary> */}
-      <Login/>
+      </ErrorBoundary>
+      {/* <LoginModal/> */}
       {/* <SignupModal/> */}
     </>
   );

@@ -1,42 +1,77 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import { signupModalStyles } from '../styles/ecommerceStyle';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { signupSchema } from '../libs/schemaValidations';
+import { signupFields } from '../constants/Fields';
+import { toast } from 'react-hot-toast';
+import { Loader2 } from 'lucide-react';
+import { signupWithEmail } from '../services/signupService';
+import { useAuth } from '../context/AuthContext';
 
-export default function SignupModal({ isOpen, setIsOpen, onLoginClick }) {
- const {
-   register,
-   handleSubmit,
-   formState: { errors },
-   reset,
-   setError,
- } = useForm({
-   resolver: zodResolver(signupSchema),
-   defaultValues: {
-     email: '',
-     password: '',
-     confirm_password: '',
-   },
- });
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+export default function SignupModal() {
+  const { setIsLoginOpen, setIsSignupOpen } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm({
+    resolver: zodResolver(signupSchema),
+    defaultValues: {
+      fullname: '',
+      email: '',
+      password: '',
+      confirm_password: '',
+    },
+  });
+
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    password: false,
+    confirm_password: false,
+  });
+
+  const toggleVisibility = (field) => {
+    setPasswordVisibility((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
   };
 
-  // const handleSubmit = () => {
-  //   if (formData.password !== formData.confirmPassword) {
-  //     alert('Passwords do not match!');
-  //     return;
-  //   }
-  //   console.log('Form submitted:', formData);
-  //   // Add your signup logic here
-  // };
+  useEffect(() => {
+    if (Object.keys(errors).length > 0) {
+      const firstError = Object.values(errors)[0];
+      toast.error(firstError.message);
+    }
+  }, [errors]);
+
+  const closeAfterToast = (callback, duration = 2000) => {
+    setTimeout(callback, duration);
+  };
+
+ const onSubmit = async (data) => {
+   const toastId = toast.loading('Creating account...');
+   try {
+     const user = await signupWithEmail(data);
+     toast.success(
+       `Welcome, account created ${user.displayName}, Please verify your email before logging in`,
+       {
+         id: toastId,
+         duration: 2000,
+       }
+     );
+     closeAfterToast(() => setIsSignupOpen(false));
+     reset();
+   } catch (error) {
+      console.log(error);
+     toast.error(error.message || 'Signup failed', {
+       id: toastId,
+     });
+   }
+ };
+
 
   return (
     <div className={signupModalStyles.overlay}>
@@ -44,10 +79,7 @@ export default function SignupModal({ isOpen, setIsOpen, onLoginClick }) {
         {/* Header */}
         <div className={signupModalStyles.header}>
           <span className={signupModalStyles.title}>Create Account</span>
-          <button
-            // onClick={() => setIsOpen(false)}
-            className={signupModalStyles.closeBtn}
-          >
+          <button onClick={() => setIsSignupOpen(false)} className={signupModalStyles.closeBtn}>
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -55,92 +87,61 @@ export default function SignupModal({ isOpen, setIsOpen, onLoginClick }) {
         {/* Content */}
         <div className={signupModalStyles.contentWrapper}>
           {/* Form Fields */}
-          <form className={signupModalStyles.formFieldWrapper} onSubmit={''}>
-            {/* Full Name */}
-            <div>
-              <label className={signupModalStyles.label}>Full Name</label>
-              <input
-                type="text"
-                name="fullName"
-                // value={formData.fullName}
-                placeholder="John Doe"
-                className={signupModalStyles.inputField}
-              />
-            </div>
+          <form className={signupModalStyles.formFieldWrapper} onSubmit={handleSubmit(onSubmit)}>
+            {signupFields.map((field) => (
+              <div key={field.name}>
+                <label className={signupModalStyles.label}>{field.label}</label>
 
-            {/* Email */}
-            <div>
-              <label className={signupModalStyles.label}>Email</label>
-              <input
-                type="email"
-                name="email"
-                // value={formData.email}
-                // onChange={handleChange}
-                placeholder="your@email.com"
-                className={signupModalStyles.inputField}
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className={signupModalStyles.label}>Password</label>
-              <div className={signupModalStyles.passwordWrapper}>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  // value={formData.password}
-                  // onChange={handleChange}
-                  placeholder="••••••••"
-                  className={signupModalStyles.inputField + ' pr-12'}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className={signupModalStyles.eyeButton}
-                >
-                  {showPassword ? (
-                    <Eye className="w-5 h-5" />
-                  ) : (
-                    <EyeOff className="w-5 h-5" />
-                  )}
-                </button>
+                {field.toggle ? (
+                  <div className={signupModalStyles.passwordWrapper}>
+                    <input
+                      {...register(field.name)}
+                      type={passwordVisibility[field.name] ? 'text' : field.type}
+                      placeholder={field.placeholder}
+                      className={`${signupModalStyles.inputField} pr-12 ${
+                        errors[field.name] ? 'border-red-500' : ''
+                      }`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => toggleVisibility(field.name)}
+                      className={signupModalStyles.eyeButton}
+                    >
+                      {passwordVisibility[field.name] ? (
+                        <Eye className="w-5 h-5" />
+                      ) : (
+                        <EyeOff className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                ) : (
+                  <input
+                    {...register(field.name)}
+                    type={field.type}
+                    placeholder={field.placeholder}
+                    className={`${signupModalStyles.inputField} ${
+                      errors[field.name] ? 'border-red-500' : ''
+                    }`}
+                  />
+                )}
               </div>
-            </div>
-
-            {/* Confirm Password */}
-            <div>
-              <label className={signupModalStyles.label}>
-                Confirm Password
-              </label>
-              <div className={signupModalStyles.passwordWrapper}>
-                <input
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  name="confirmPassword"
-                  // value={formData.confirmPassword}
-                  // onChange={handleChange}
-                  placeholder="••••••••"
-                  className={signupModalStyles.inputField + ' pr-12'}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className={signupModalStyles.eyeButton}
-                >
-                  {showConfirmPassword ? (
-                    <Eye className="w-5 h-5" />
-                  ) : (
-                    <EyeOff className="w-5 h-5" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Sign Up Button */}
+            ))}
             <button
               type="submit"
-              className={signupModalStyles.submitButton}
+              disabled={isSubmitting}
+              className={`${signupModalStyles.submitButton} ${
+                isSubmitting ? 'opacity-60 cursor-not-allowed' : ''
+              }`}
             >
-              Sign Up
+              {' '}
+              {isSubmitting ? (
+                <span className="flex items-center gap-2 italic">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Signing up...
+                </span>
+              ) : (
+                'Sign up'
+              )}
             </button>
           </form>
 
@@ -148,13 +149,13 @@ export default function SignupModal({ isOpen, setIsOpen, onLoginClick }) {
           <div className={signupModalStyles.loginLinkWrapper}>
             <span className="text-gray-600">Already have an account? </span>
             <button
-              // onClick={() => {
-              //   setIsOpen(false);
-              //   if (onLoginClick) onLoginClick();
-              // }}
+              onClick={() => {
+                setIsLoginOpen(true);
+                setIsSignupOpen(false);
+              }}
               className={signupModalStyles.loginLink}
             >
-              Login here
+              Log in
             </button>
           </div>
         </div>

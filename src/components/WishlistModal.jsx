@@ -5,30 +5,22 @@ import toast from 'react-hot-toast';
 import { useContext } from 'react';
 import { cartContext } from '../context/cartContext';
 
-export default function WishlistModal({
-  isOpen,
-  setIsOpen,
-  wishListProducts,
-  setWishListProdutcs,
-}) {
-  const { addToCart, quantity } = useContext(cartContext);
+export default function WishlistModal({ isOpen, setIsOpen }) {
+  const { wishListProducts, setWishListProducts, addToCart, quantity } = useContext(cartContext);
 
   if (!isOpen) return null;
 
   function handleCart(product) {
     addToCart(product, quantity);
     toast.success('Added to Cart');
-    const updateWislistProduct = wishListProducts.filter((item)=>item.id !== product.id);
-    setWishListProdutcs(updateWislistProduct)
+    const updateWishlistProduct = wishListProducts.filter((item) => item.id !== product.id);
+    setWishListProducts(updateWishlistProduct);
   }
 
   function handleRemoveWishListProduct(id) {
-    console.log(id);
-    const filteredWishlistProduct = wishListProducts.filter(
-      (product) => product.id !== id
-    );
-    setWishListProdutcs(filteredWishlistProduct);
-    toast.error("Product remove from Wishlist")
+    const filteredWishlistProduct = wishListProducts.filter((product) => product.id !== id);
+    setWishListProducts(filteredWishlistProduct);
+    toast.error('Product removed from Wishlist');
   }
 
   return (
@@ -37,10 +29,7 @@ export default function WishlistModal({
         {/* Header */}
         <div className={wishListModalStyles.header}>
           <h2 className={wishListModalStyles.title}>My Wishlist</h2>
-          <button
-            onClick={() => setIsOpen(false)}
-            className={wishListModalStyles.closeBtn}
-          >
+          <button onClick={() => setIsOpen(false)} className={wishListModalStyles.closeBtn}>
             <X className="w-6 h-6" />
           </button>
         </div>
@@ -62,12 +51,8 @@ export default function WishlistModal({
                     </div>
 
                     <div className={wishListModalStyles.info}>
-                      <h3 className={wishListModalStyles.productTitle}>
-                        {product.title}
-                      </h3>
-                      <p className={wishListModalStyles.price}>
-                        ${product.price}
-                      </p>
+                      <h3 className={wishListModalStyles.productTitle}>{product.title}</h3>
+                      <p className={wishListModalStyles.price}>${product.price}</p>
                     </div>
                   </div>
 
@@ -90,9 +75,7 @@ export default function WishlistModal({
               ))
             ) : (
               <div className={wishListModalStyles.emptyWrapper}>
-                <p className={wishListModalStyles.emptyText}>
-                  Your wishlist is empty
-                </p>
+                <p className={wishListModalStyles.emptyText}>Your wishlist is empty</p>
                 <p className={wishListModalStyles.emptySubText}>
                   Start adding products to your wishlist!
                 </p>

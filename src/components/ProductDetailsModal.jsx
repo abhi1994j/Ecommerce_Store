@@ -54,10 +54,8 @@ export default function ProductDetailsModal({ isOpen, setIsOpen, product}) {
               <div className={modalStyles.productInfo}>
                 {/* Category */}
                 <p className={modalStyles.category}>{product.category}</p>
-
                 {/* Product Title */}
                 <h1 className={modalStyles.productTitle}>{product.title}</h1>
-
                 {/* Rating */}
                 <div className={modalStyles.ratingContainer}>
                   <Star className={modalStyles.ratingIcon} />
@@ -68,13 +66,10 @@ export default function ProductDetailsModal({ isOpen, setIsOpen, product}) {
                     ({product.rating.count})
                   </span>
                 </div>
-
                 {/* Price */}
                 <p className={modalStyles.price}>${product.price}</p>
-
                 {/* Description */}
                 <p className={modalStyles.description}>{product.description}</p>
-
                 {/* Action Buttons */}
                 <div className={modalStyles.quantityContainer}>
                   <label
@@ -92,7 +87,6 @@ export default function ProductDetailsModal({ isOpen, setIsOpen, product}) {
                     className={`${modalStyles.quantityInput}`}
                   />
                 </div>
-
                 <button
                   className={modalStyles.addToCartButton}
                   onClick={() => handleCart()}
