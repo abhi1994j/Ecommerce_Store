@@ -125,9 +125,8 @@ const Dashboard = () => {
   if (loading)
     return (
       <div>
-        <Navbar />
         <p className="text-center mt-10 flex items-center justify-center gap-2">
-          <Loader /> Loading products...
+          <Loader /> products...
         </p>
       </div>
     );
@@ -135,7 +134,6 @@ const Dashboard = () => {
   if (error)
     return (
       <div>
-        <Navbar />
         <p className="text-center text-red-500 mt-10">{error}</p>
       </div>
     );

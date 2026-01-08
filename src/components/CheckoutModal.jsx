@@ -50,7 +50,7 @@ export default function CheckoutModal({ isOpen, setIsOpen }) {
       // In a real app, you would create an order on your backend
       // and get the Razorpay order_id
       const options = {
-        key: 'rzp_test_your_key_here', // Replace with your Razorpay key
+        key: import.meta.env.VITE_RAZORPAY_KEY, // Replace with your Razorpay key
         amount: Math.round(total * 100), // Amount in paise
         currency: 'INR',
         name: 'Store',

@@ -17,6 +17,7 @@
     "firebase": "^12.7.0",
     "joi": "^18.0.2",
     "lucide-react": "^0.562.0",
+    "razorpay": "^2.9.6",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-error-boundary": "^6.0.0",
