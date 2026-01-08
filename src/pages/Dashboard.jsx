@@ -35,10 +35,13 @@ const Dashboard = () => {
 
   const debouncedSearchTerm = useDebounce(searchQuery, 300);
 
-  // Store original products on first load
+  // Store original products on first load AND initialize filteredProducts
   useEffect(() => {
-    if (productList.length > 0 && originalProducts.current.length === 0) {
-      originalProducts.current = [...productList];
+    if (productList.length > 0) {
+      if (originalProducts.current.length === 0) {
+        originalProducts.current = [...productList];
+        setFilteredProducts([...productList]); // Initialize filtered products
+      }
     }
   }, [productList]);
 
@@ -97,7 +100,7 @@ const Dashboard = () => {
     }
 
     setFilteredProducts(filtered);
-  }, [debouncedSearchTerm, priceFilter, ratingFilter, activeCategory, originalProducts]);
+  }, [debouncedSearchTerm, priceFilter, ratingFilter, activeCategory]);
 
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
