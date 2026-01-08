@@ -187,10 +187,10 @@ const shoppingCartModalStyles = {
 // styles/ecommerceStyle.js
 
 const signupModalStyles = {
-  overlay: "flex flex-col justify-start items-center p-4 transition-all duration-300 ease-in-out backdrop-blur-sm p-4 w-[60%]",
+  overlay: "flex flex-col justify-start items-center p-4 transition-all duration-300 ease-in-out backdrop-blur-sm p-4 md:w-[60%] w-full",
   modal: "bg-white rounded-2xl shadow-2xl w-full max-w-md",
   header: "flex items-center justify-between m-4",
-  title: "text-3xl font-bold text-gray-900",
+  title: "text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900",
   closeBtn: "text-gray-400 hover:text-gray-600 transition-colors cursor-pointer",
   contentWrapper: "p-8",
   formFieldWrapper: "space-y-5",

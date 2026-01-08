@@ -139,8 +139,8 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className={`max-w-7xl mx-auto px-4 py-6 flex`}>
-        <div className='w-full'>
+      <div className={`max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row`}>
+        <div className="w-full order-1 md:order-0">
           {/* Search and Filter Bar */}
           <div className="mb-6 space-y-4">
             {/* Search Bar */}
@@ -354,11 +354,13 @@ const Dashboard = () => {
           </div>
         </div>
         {/* Modals */}
-        {isLoginOpen && <LoginModal />}
-        {isSignupOpen && <SignupModal />}
-        {isOpen && selectedProduct && (
-          <ProductDetailsModal isOpen={isOpen} setIsOpen={setIsOpen} product={selectedProduct} />
-        )}
+
+          {isLoginOpen && <LoginModal />}
+          {isSignupOpen && <SignupModal />}
+          {isOpen && selectedProduct && (
+            <ProductDetailsModal isOpen={isOpen} setIsOpen={setIsOpen} product={selectedProduct} />
+          )}
+
       </div>
     </>
   );
