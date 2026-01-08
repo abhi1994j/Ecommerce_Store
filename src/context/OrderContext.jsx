@@ -125,7 +125,7 @@ export const OrderProvider = ({ children }) => {
       setSelectedAddress(filteredAddresses[0] || null);
     }
 
-    toast.success('Address deleted successfully');
+    // toast.success('Address deleted successfully');
   };
 
   // Set default address
@@ -150,7 +150,7 @@ export const OrderProvider = ({ children }) => {
     };
 
     setOrders([newOrder, ...orders]);
-    toast.success('Order placed successfully!');
+    // toast.success('Order placed successfully!');
     return newOrder;
   };
 

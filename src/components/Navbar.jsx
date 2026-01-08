@@ -86,7 +86,11 @@ export default function Navbar() {
         <div className={navbarStyles.wrapper}>
           <div className={navbarStyles.innerWrapper}>
             {/* Logo */}
-            <div className={navbarStyles.logoWrapper} onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
+            <div
+              className={navbarStyles.logoWrapper}
+              onClick={() => navigate('/')}
+              style={{ cursor: 'pointer' }}
+            >
               <div className={navbarStyles.logoIcon}>
                 <span className={navbarStyles.logoText}>S</span>
               </div>
@@ -124,10 +128,7 @@ export default function Navbar() {
               </button>
 
               {/* Cart */}
-              <button
-                className={navbarStyles.button}
-                onClick={handleCheckout}
-              >
+              <button className={navbarStyles.button} onClick={handleCheckout}>
                 <ShoppingCart className="w-5 h-5" />
                 <span className="font-medium">Cart</span>
                 <span className={navbarStyles.badge}>{cartList.length}</span>
@@ -138,7 +139,7 @@ export default function Navbar() {
                 <div className="relative" ref={profileRef}>
                   <button
                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                    className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 shadow-lg"
+                    className={navbarStyles.button}
                   >
                     <User className="w-5 h-5" />
                     <p className="font-medium rounded-full border border-white px-2 py-0.5">
@@ -171,15 +172,6 @@ export default function Navbar() {
                   )}
                 </div>
               )}
-
-              {!user && (
-                <button
-                  onClick={() => setIsLoginOpen(true)}
-                  className="px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 shadow-lg font-medium"
-                >
-                  Login
-                </button>
-              )}
             </div>
 
             {/* Mobile Menu Button */}
@@ -198,10 +190,12 @@ export default function Navbar() {
             <div className={navbarStyles.mobileMenuWrapper}>
               <button
                 className={navbarStyles.mobileButton}
-                onClick={() => requireAuth(() => {
-                  navigate('/orders');
-                  setIsMenuOpen(false);
-                })}
+                onClick={() =>
+                  requireAuth(() => {
+                    navigate('/orders');
+                    setIsMenuOpen(false);
+                  })
+                }
               >
                 <Package className="w-5 h-5" />
                 <span>Orders</span>
@@ -209,10 +203,12 @@ export default function Navbar() {
 
               <button
                 className={navbarStyles.mobileButton}
-                onClick={() => requireAuth(() => {
-                  setIsAddressModalOpen(true);
-                  setIsMenuOpen(false);
-                })}
+                onClick={() =>
+                  requireAuth(() => {
+                    setIsAddressModalOpen(true);
+                    setIsMenuOpen(false);
+                  })
+                }
               >
                 <MapPin className="w-5 h-5" />
                 <span>Addresses</span>
@@ -220,10 +216,12 @@ export default function Navbar() {
 
               <button
                 className={navbarStyles.mobileButton}
-                onClick={() => requireAuth(() => {
-                  setIsWishlistOpen(true);
-                  setIsMenuOpen(false);
-                })}
+                onClick={() =>
+                  requireAuth(() => {
+                    setIsWishlistOpen(true);
+                    setIsMenuOpen(false);
+                  })
+                }
               >
                 <Heart className="w-5 h-5" />
                 <span>Wishlist</span>
@@ -243,32 +241,22 @@ export default function Navbar() {
               </button>
 
               {/* Mobile User Section */}
-              {user ? (
+              {user && (
                 <div className="border-t border-gray-200 pt-2 mt-2">
                   <div className="px-4 py-2 bg-gray-50 rounded-lg mx-2">
                     <p className="text-sm font-semibold text-gray-800">
                       {user.displayName || 'User'}
                     </p>
                     <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center justify-center cursor-pointer gap-2 w-full px-4 py-2 text-red-600 hover:bg-red-50 mt-2"
+                    >
+                      <LogOut className="w-5 h-5" />
+                      <span>Logout</span>
+                    </button>
                   </div>
-                  <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 w-full px-4 py-2 text-red-600 hover:bg-red-50 mt-2"
-                  >
-                    <LogOut className="w-5 h-5" />
-                    <span>Logout</span>
-                  </button>
                 </div>
-              ) : (
-                <button
-                  onClick={() => {
-                    setIsLoginOpen(true);
-                    setIsMenuOpen(false);
-                  }}
-                  className="mx-2 mt-2 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-all duration-200 shadow-lg font-medium text-center"
-                >
-                  Login
-                </button>
               )}
             </div>
           )}
@@ -285,18 +273,11 @@ export default function Navbar() {
       )}
 
       {isAddressModalOpen && (
-        <AddressModal
-          isOpen={isAddressModalOpen}
-          setIsOpen={setIsAddressModalOpen}
-          mode="manage"
-        />
+        <AddressModal isOpen={isAddressModalOpen} setIsOpen={setIsAddressModalOpen} mode="manage" />
       )}
 
       {isCheckoutModalOpen && (
-        <CheckoutModal
-          isOpen={isCheckoutModalOpen}
-          setIsOpen={setIsCheckoutModalOpen}
-        />
+        <CheckoutModal isOpen={isCheckoutModalOpen} setIsOpen={setIsCheckoutModalOpen} />
       )}
     </nav>
   );

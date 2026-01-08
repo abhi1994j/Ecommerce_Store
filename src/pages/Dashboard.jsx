@@ -7,7 +7,6 @@ import { cartContext } from '../context/cartContext';
 import ProductCard from '../components/ProductCard';
 import { Loader } from '../libs/Loader';
 import ProductDetailsModal from '../components/ProductDetailsModal';
-import ShoppingCartDetails from '../components/ShoppingCartDetails';
 import { useAuth } from '../context/AuthContext';
 import LoginModal from '../components/LoginModal';
 import SignupModal from '../components/SignupModal';
@@ -141,7 +140,7 @@ const Dashboard = () => {
   return (
     <>
       <div className={`max-w-7xl mx-auto px-4 py-6 flex`}>
-        <div>
+        <div className='w-full'>
           {/* Search and Filter Bar */}
           <div className="mb-6 space-y-4">
             {/* Search Bar */}
@@ -357,7 +356,6 @@ const Dashboard = () => {
         {/* Modals */}
         {isLoginOpen && <LoginModal />}
         {isSignupOpen && <SignupModal />}
-        {isOpenCart && <ShoppingCartDetails />}
         {isOpen && selectedProduct && (
           <ProductDetailsModal isOpen={isOpen} setIsOpen={setIsOpen} product={selectedProduct} />
         )}

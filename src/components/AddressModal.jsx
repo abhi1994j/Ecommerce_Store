@@ -66,11 +66,37 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
     resetForm();
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this address?')) {
-      deleteAddress(id);
-    }
+
+  const handleDeleteAddtess = (id) => {
+    toast(
+      (t) => (
+        <div className="flex flex-col gap-3">
+          <p className="font-medium">Are you sure you want to delete this address?</p>
+
+          <div className="flex justify-end gap-2">
+            <button onClick={() => toast.dismiss(t.id)} className="px-3 py-1 border rounded-md">
+              Cancel
+            </button>
+
+            <button
+              onClick={() => {
+                deleteAddress(id);
+                toast.dismiss(t.id);
+                toast.success('Address deleted successfully');
+              }}
+              className="px-3 py-1 bg-red-600 text-white rounded-md"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: Infinity, // wait for user action
+      }
+    );
   };
+
 
   const handleSelectAddress = (address) => {
     setSelectedAddress(address);
@@ -82,7 +108,7 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 backdrop-blur-xs bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
@@ -144,7 +170,8 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                           </div>
                           <p className="text-gray-600 text-sm mb-1">{address.phone}</p>
                           <p className="text-gray-600 text-sm">
-                            {address.addressLine1}, {address.addressLine2 && `${address.addressLine2}, `}
+                            {address.addressLine1},{' '}
+                            {address.addressLine2 && `${address.addressLine2}, `}
                             {address.city}, {address.state} - {address.pincode}
                           </p>
                         </div>
@@ -185,7 +212,7 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDelete(address.id);
+                            handleDeleteAddtess(address.id);
                           }}
                           className="text-sm text-red-600 hover:text-red-700 flex items-center gap-1"
                         >
@@ -221,7 +248,12 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                   <input
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        phone: e.target.value.replace(/\D/g, '').slice(0, 10),
+                      })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="10 digit mobile number"
                   />
@@ -256,9 +288,7 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    City *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
                   <input
                     type="text"
                     value={formData.city}
@@ -268,9 +298,7 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    State *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
                   <input
                     type="text"
                     value={formData.state}
@@ -280,13 +308,16 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Pincode *
-                  </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
                   <input
                     type="text"
                     value={formData.pincode}
-                    onChange={(e) => setFormData({ ...formData, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        pincode: e.target.value.replace(/\D/g, '').slice(0, 6),
+                      })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="6 digits"
                   />

@@ -1,10 +1,10 @@
 // dashboardStyles.js
 
 const dashboardStyles = {
-  container: "p-6",
+  container: "p-2 md:p-4 lg:p-6",
   title: "text-gray-500 font-semibold mb-4",
-  buttonContainer: "flex items-center gap-2 ",
-  button: "px-4 py-2 rounded-lg text-xs font-semibold cursor-pointer"
+  buttonContainer: "flex items-center flex-wrap md:no-wrap gap-1 md:gap-2 ",
+  button: "px-2 md:px-4 py-1 md:py-2 rounded-lg text-xs font-semibold cursor-pointer text-sm md:text-base"
 };
 
 // productCardStyles.js
@@ -36,16 +36,16 @@ const navbarStyles = {
   logoText: "text-white font-bold text-xl",
   storeText: "text-white font-bold text-2xl",
   /* Desktop */
-  desktopNav: "hidden md:flex items-center gap-4",
+  desktopNav: "hidden lg:flex items-center gap-4",
   /* Buttons */
-  button: "relative bg-pink-500 hover:bg-pink-600 text-white px-6 py-2 rounded-lg flex items-center gap-2 transition-colors shadow-md cursor-pointer",
+  button: "relative cursor-pointer bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all duration-200 shadow-md cursor-pointer md:text-sm lg:text-base",
   badge: "absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center",
   /* Mobile */
-  mobileMenuBtn: "md:hidden",
+  mobileMenuBtn: "lg:hidden cursor-pointer",
   mobileMenuIcon: "text-white hover:bg-blue-700 p-2 rounded-lg transition-colors",
-  mobileMenuWrapper: "md:hidden pb-4 space-y-3",
-  mobileButton: "w-full bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-md",
-  mobileBadge: "absolute top-1 right-4 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center",
+  mobileMenuWrapper: "lg:hidden pb-4 space-y-3",
+  mobileButton: "w-full cursor-pointer bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-md",
+  mobileBadge: "absolute  right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center",
   /* Search */
   searchWrapperDesktop: "hidden md:flex flex-1 max-w-xl mx-8",
   searchWrapperMobile: "md:hidden px-4 pb-3",
