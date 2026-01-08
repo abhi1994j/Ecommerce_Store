@@ -4,6 +4,7 @@ import { Loader } from './libs/Loader';
 import { ErrorBoundary } from 'react-error-boundary';
 import { Toaster } from 'react-hot-toast';
 import { Routes, Route } from 'react-router-dom';
+import Navbar from './components/Navbar';
 
 function App() {
   // Lazy-loaded components
@@ -21,6 +22,7 @@ function App() {
       >
         <Suspense fallback={<Loader />}>
           {/* <Dashboard /> */}
+          <Navbar/>
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/orders" element={<OrdersPage />} />

@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { Package, ChevronDown, ChevronUp, MapPin, CreditCard, Calendar, DollarSign } from 'lucide-react';
+import {
+  Package,
+  ChevronDown,
+  ChevronUp,
+  MapPin,
+  CreditCard,
+  Calendar,
+  DollarSign,
+} from 'lucide-react';
 import { useOrder } from '../context/OrderContext';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
@@ -68,7 +76,6 @@ export default function OrdersPage() {
 
   return (
     <>
-      <Navbar />
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">My Orders</h1>
@@ -155,9 +162,7 @@ export default function OrdersPage() {
                     <p className="text-sm text-gray-600">
                       {order.items.length} item{order.items.length > 1 ? 's' : ''}
                     </p>
-                    <p className="text-lg font-bold text-purple-600">
-                      ${order.total.toFixed(2)}
-                    </p>
+                    <p className="text-lg font-bold text-purple-600">${order.total.toFixed(2)}</p>
                   </div>
                 </div>
 
