@@ -65,8 +65,8 @@ const navbarStyles = {
 
 
 const modalStyles = {
-  modalOverlay: "fixed inset-0 w-full flex items-center justify-center p-4 backdrop-blur-xs z-50",
-  modalContainer: "bg-white rounded-lg shadow-2xl w-[60%] max-w-6xl max-h-[90vh] overflow-hidden",
+  modalOverlay: "fixed inset-0 w-full max-w-3xl md:max-w-6xl flex items-center justify-center p-2 md:p-4 backdrop-blur-xs z-50",
+  modalContainer: "bg-white rounded-lg shadow-2xl w-full  max-h-[90vh] overflow-hidden",
   modalHeader: "flex items-center justify-between p-6 border-b border-gray-200",
   modalTitle: "text-2xl font-bold text-gray-900",
   closeButton: "text-gray-400 hover:text-gray-600 transition-colors cursor-pointer",
