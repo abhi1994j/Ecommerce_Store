@@ -65,14 +65,14 @@ const navbarStyles = {
 
 
 const modalStyles = {
-  modalOverlay: "fixed inset-0 w-full max-w-3xl md:max-w-6xl flex items-center justify-center p-2 md:p-4 backdrop-blur-xs z-50",
-  modalContainer: "bg-white rounded-lg shadow-2xl w-full  max-h-[90vh] overflow-hidden",
+  modalOverlay: "fixed inset-0 w-full flex items-center justify-center p-2 md:p-4 backdrop-blur-xs z-50",
+  modalContainer: "bg-white rounded-lg shadow-2xl w-full max-w-sm md:max-w-xl max-h-[90vh] overflow-hidden",
   modalHeader: "flex items-center justify-between p-6 border-b border-gray-200",
   modalTitle: "text-2xl font-bold text-gray-900",
   closeButton: "text-gray-400 hover:text-gray-600 transition-colors cursor-pointer",
   modalContent: "overflow-y-auto max-h-[calc(90vh-80px)]",
   productImageContainer: "bg-gray-50 h-90 w-full rounded-lg p-8 flex items-center justify-center",
-  productImage: "w-full h-full object-cover",
+  productImage: "w-[80%] md:w-full h-full object-cover ",
   productInfo: "flex flex-col gap-2",
   category: "text-gray-500 text-xs font-medium uppercase",
   productTitle: "text-xl font-bold text-gray-900 leading-tight",
