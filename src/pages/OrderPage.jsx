@@ -10,13 +10,13 @@ import {
 } from 'lucide-react';
 import { useOrder } from '../context/OrderContext';
 import { useAuth } from '../context/AuthContext';
-import Navbar from '../components/Navbar';
 
 export default function OrdersPage() {
   const { orders } = useOrder();
   const { user } = useAuth();
   const [expandedOrder, setExpandedOrder] = useState(null);
 
+  console.log("orders" , orders);
   const getStatusColor = (status) => {
     switch (status) {
       case 'confirmed':
