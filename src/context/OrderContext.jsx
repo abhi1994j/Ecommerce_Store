@@ -12,7 +12,7 @@ import {
   deleteDoc,
   updateDoc
 } from 'firebase/firestore';
-import { db } from './firebase'; // Your Firebase config
+import { db } from '../firebase/firebase'; // Your Firebase config
 
 export const OrderContext = createContext();
 
@@ -38,14 +38,16 @@ export const OrderProvider = ({ children }) => {
       // Fetch orders
       const ordersQuery = query(
         collection(db, 'orders'),
-        where('userId', '==', userId),
-        orderBy('orderDate', 'desc')
+        where('userId', '==', userId)
       );
       const ordersSnapshot = await getDocs(ordersQuery);
       const loadedOrders = ordersSnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data()
-      }));
+      }))
+      // Sort in memory instead of using orderBy
+      .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate));
+
       setOrders(loadedOrders);
 
       // Fetch addresses
@@ -237,7 +239,7 @@ export const OrderProvider = ({ children }) => {
       // Update local state
       setOrders([newOrder, ...orders]);
 
-      toast.success('Order placed successfully!');
+      // toast.success('Order placed successfully!');
       return newOrder;
     } catch (error) {
       console.error('Error creating order:', error);
