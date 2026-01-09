@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
 import { X, Plus, MapPin, Edit2, Trash2, Check } from 'lucide-react';
 import { useOrder } from '../context/OrderContext';
 import toast from 'react-hot-toast';
@@ -7,19 +8,16 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
   const { addresses, selectedAddress, setSelectedAddress, addAddress, updateAddress, deleteAddress, setDefaultAddress } = useOrder();
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [formData, setFormData] = useState({
-    fullName: '',
-    phone: '',
-    addressLine1: '',
-    addressLine2: '',
-    city: '',
-    state: '',
-    pincode: '',
-    isDefault: false,
-  });
 
-  const resetForm = () => {
-    setFormData({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    setValue,
+    watch
+  } = useForm({
+    defaultValues: {
       fullName: '',
       phone: '',
       addressLine1: '',
@@ -28,46 +26,38 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
       state: '',
       pincode: '',
       isDefault: false,
-    });
+    }
+  });
+
+  const resetForm = () => {
+    reset();
     setEditingId(null);
     setShowAddForm(false);
   };
 
   const handleEdit = (address) => {
-    setFormData(address);
+    // Set form values when editing
+    Object.keys(address).forEach(key => {
+      setValue(key, address[key]);
+    });
     setEditingId(address.id);
     setShowAddForm(true);
   };
 
-  const handleSubmit = () => {
-    // Validation
-    if (!formData.fullName || !formData.phone || !formData.addressLine1 ||
-        !formData.city || !formData.state || !formData.pincode) {
-      toast.error('Please fill all required fields');
-      return;
+  const onSubmit = async (data) => {
+    try {
+      if (editingId) {
+        await updateAddress(editingId, data);
+      } else {
+        await addAddress(data);
+      }
+      resetForm();
+    } catch (error) {
+      console.error('Error saving address:', error);
     }
-
-    if (formData.phone.length !== 10) {
-      toast.error('Phone number must be 10 digits');
-      return;
-    }
-
-    if (formData.pincode.length !== 6) {
-      toast.error('Pincode must be 6 digits');
-      return;
-    }
-
-    if (editingId) {
-      updateAddress(editingId, formData);
-    } else {
-      addAddress(formData);
-    }
-
-    resetForm();
   };
 
-
-  const handleDeleteAddtess = (id) => {
+  const handleDeleteAddress = (id) => {
     toast(
       (t) => (
         <div className="flex flex-col gap-3">
@@ -82,7 +72,6 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
               onClick={() => {
                 deleteAddress(id);
                 toast.dismiss(t.id);
-                toast.success('Address deleted successfully');
               }}
               className="px-3 py-1 bg-red-600 text-white rounded-md"
             >
@@ -92,11 +81,10 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
         </div>
       ),
       {
-        duration: Infinity, // wait for user action
+        duration: Infinity,
       }
     );
   };
-
 
   const handleSelectAddress = (address) => {
     setSelectedAddress(address);
@@ -212,7 +200,7 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteAddtess(address.id);
+                            handleDeleteAddress(address.id);
                           }}
                           className="text-sm text-red-600 hover:text-red-700 flex items-center gap-1"
                         >
@@ -227,7 +215,7 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
             </>
           ) : (
             /* Add/Edit Form */
-            <div className="space-y-4">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -235,10 +223,20 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                   </label>
                   <input
                     type="text"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    {...register('fullName', {
+                      required: 'Full name is required',
+                      minLength: {
+                        value: 2,
+                        message: 'Name must be at least 2 characters'
+                      }
+                    })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      errors.fullName ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   />
+                  {errors.fullName && (
+                    <p className="text-red-500 text-xs mt-1">{errors.fullName.message}</p>
+                  )}
                 </div>
 
                 <div>
@@ -247,16 +245,22 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                   </label>
                   <input
                     type="tel"
-                    value={formData.phone}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        phone: e.target.value.replace(/\D/g, '').slice(0, 10),
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    {...register('phone', {
+                      required: 'Phone number is required',
+                      pattern: {
+                        value: /^[0-9]{10}$/,
+                        message: 'Phone number must be exactly 10 digits'
+                      }
+                    })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      errors.phone ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     placeholder="10 digit mobile number"
+                    maxLength={10}
                   />
+                  {errors.phone && (
+                    <p className="text-red-500 text-xs mt-1">{errors.phone.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -266,11 +270,21 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                 </label>
                 <input
                   type="text"
-                  value={formData.addressLine1}
-                  onChange={(e) => setFormData({ ...formData, addressLine1: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  {...register('addressLine1', {
+                    required: 'Address line 1 is required',
+                    minLength: {
+                      value: 5,
+                      message: 'Address must be at least 5 characters'
+                    }
+                  })}
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                    errors.addressLine1 ? 'border-red-500' : 'border-gray-300'
+                  }`}
                   placeholder="House No, Building Name"
                 />
+                {errors.addressLine1 && (
+                  <p className="text-red-500 text-xs mt-1">{errors.addressLine1.message}</p>
+                )}
               </div>
 
               <div>
@@ -279,8 +293,7 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                 </label>
                 <input
                   type="text"
-                  value={formData.addressLine2}
-                  onChange={(e) => setFormData({ ...formData, addressLine2: e.target.value })}
+                  {...register('addressLine2')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                   placeholder="Road Name, Area, Colony"
                 />
@@ -291,36 +304,62 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                   <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
                   <input
                     type="text"
-                    value={formData.city}
-                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    {...register('city', {
+                      required: 'City is required',
+                      minLength: {
+                        value: 2,
+                        message: 'City must be at least 2 characters'
+                      }
+                    })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      errors.city ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   />
+                  {errors.city && (
+                    <p className="text-red-500 text-xs mt-1">{errors.city.message}</p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
                   <input
                     type="text"
-                    value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    {...register('state', {
+                      required: 'State is required',
+                      minLength: {
+                        value: 2,
+                        message: 'State must be at least 2 characters'
+                      }
+                    })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      errors.state ? 'border-red-500' : 'border-gray-300'
+                    }`}
                   />
+                  {errors.state && (
+                    <p className="text-red-500 text-xs mt-1">{errors.state.message}</p>
+                  )}
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
                   <input
                     type="text"
-                    value={formData.pincode}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        pincode: e.target.value.replace(/\D/g, '').slice(0, 6),
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    {...register('pincode', {
+                      required: 'Pincode is required',
+                      pattern: {
+                        value: /^[0-9]{6}$/,
+                        message: 'Pincode must be exactly 6 digits'
+                      }
+                    })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                      errors.pincode ? 'border-red-500' : 'border-gray-300'
+                    }`}
                     placeholder="6 digits"
+                    maxLength={6}
                   />
+                  {errors.pincode && (
+                    <p className="text-red-500 text-xs mt-1">{errors.pincode.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -328,8 +367,7 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                 <input
                   type="checkbox"
                   id="isDefault"
-                  checked={formData.isDefault}
-                  onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
+                  {...register('isDefault')}
                   className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
                 />
                 <label htmlFor="isDefault" className="text-sm text-gray-700">
@@ -346,14 +384,13 @@ export default function AddressModal({ isOpen, setIsOpen, mode = 'select' }) {
                   Cancel
                 </button>
                 <button
-                  type="button"
-                  onClick={handleSubmit}
+                  type="submit"
                   className="flex-1 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition font-medium"
                 >
                   {editingId ? 'Update Address' : 'Save Address'}
                 </button>
               </div>
-            </div>
+            </form>
           )}
         </div>
       </div>
