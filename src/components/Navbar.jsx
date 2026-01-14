@@ -54,6 +54,7 @@ export default function Navbar() {
       await signOut(auth);
       toast.success('Logged out successfully', { id: toastId });
       setIsProfileOpen(false);
+      setIsMenuOpen(false)
     } catch (error) {
       toast.error(`Failed to logout :${error}`, { id: toastId });
     }
