@@ -30,6 +30,7 @@ export default function Navbar() {
 
   const requireAuth = (action) => {
     if (!user) {
+      setIsMenuOpen(false); // Close mobile menu
       setIsSignupOpen(false);
       setIsLoginOpen(true);
       return;
@@ -71,6 +72,7 @@ export default function Navbar() {
 
   const handleCheckout = () => {
     if (!user) {
+      setIsMenuOpen(false); // Close mobile menu
       setIsLoginOpen(true);
       return;
     }
